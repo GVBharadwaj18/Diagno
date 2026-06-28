@@ -1,11 +1,42 @@
 import React, { useContext, useEffect, useState } from "react";
-
 import { NavLink, useNavigate } from "react-router-dom";
-import { FaBars, FaTimes } from "react-icons/fa"; // Import FaTimes for the cross icon
-import logo from "../assets/Diagno_main_logo.png";
+import { FaBars, FaTimes } from "react-icons/fa";
 import { UserContext } from "../context/UserContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
+// Inline SVG brand logo — no external image needed
+function BrandLogo() {
+  return (
+    <NavLink to="/" className="brand-logo" style={{ textDecoration: "none" }}>
+      <svg
+        className="brand-logo-icon"
+        viewBox="0 0 36 36"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        {/* Outer ring */}
+        <circle cx="18" cy="18" r="17" stroke="url(#grad1)" strokeWidth="1.5" />
+        {/* ECG / pulse line */}
+        <polyline
+          points="4,18 9,18 11,10 13,26 16,14 18,22 20,18 32,18"
+          stroke="url(#grad1)"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+        <defs>
+          <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#00d4ff" />
+            <stop offset="100%" stopColor="#7c3aed" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <span className="brand-logo-text">Diagno</span>
+    </NavLink>
+  );
+}
 
 function Navbar() {
   const { userInfo, setUserInfo } = useContext(UserContext);
@@ -101,9 +132,10 @@ function Navbar() {
         pauseOnFocusLoss
         draggable
         pauseOnHover
+        theme="dark"
       />
       <div className="navbar-logo">
-        <img src={logo} alt="Diagno" />
+        <BrandLogo />
       </div>
       <div className={`navbar-links ${isMobile ? "mobile active" : ""}`}>
         <NavLink
@@ -124,25 +156,16 @@ function Navbar() {
         >
           Predictors
         </NavLink>
-        <NavLink
-          to="/about"
-          className={({ isActive }) =>
-            isActive ? "navbar-link active" : "navbar-link"
-          }
-          onClick={handleLinkClick}
-        >
-          About us
-        </NavLink>
         {isLoggedIn ? (
           <div className={`navbar-auth ${isMobile ? "mobile" : ""}`}>
             <span
               style={{
-                fontFamily: "Arial, sans-serif",
-                fontWeight: "bold",
-                fontSize: "1.2rem",
+                color: "#94a3b8",
+                fontWeight: "500",
+                fontSize: "0.95rem",
               }}
             >
-              Hello, {userInfo.data.username}
+              Hi, <strong style={{ color: "#00d4ff" }}>{userInfo.data.username}</strong>
             </span>
             <NavLink
               to="/"
@@ -173,7 +196,7 @@ function Navbar() {
         )}
       </div>
       <div className="hamburger" onClick={toggleMobileMenu}>
-        {isMobile ? <FaTimes size={30} /> : <FaBars size={30} />}
+        {isMobile ? <FaTimes size={26} /> : <FaBars size={26} />}
       </div>
     </nav>
   );

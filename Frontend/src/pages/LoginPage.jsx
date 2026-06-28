@@ -1,11 +1,9 @@
 import React, { useState, useContext } from "react";
 import "../App.css";
-import LoginVector from "../assets/LoginVector.png";
 import { UserContext } from "../context/UserContext";
 import { useNavigate, Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import dotenv from "dotenv";
 
 function LoginPage() {
   const [username, setUsername] = useState("");
@@ -81,14 +79,18 @@ function LoginPage() {
         pauseOnFocusLoss
         draggable
         pauseOnHover
+        theme="dark"
       />
       <div className="login-container">
         <div className="login-form-container">
-          <h2 className="login-title">Log In</h2>
+          <h2 className="login-title">Welcome Back</h2>
+          <p style={{ color: "#64748b", fontSize: "0.9rem", marginBottom: "0.5rem" }}>
+            Sign in to your Diagno account
+          </p>
           <form className="login-form" onSubmit={login}>
             <input
               type="email"
-              placeholder="Email"
+              placeholder="Email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -99,22 +101,21 @@ function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
             />
             <button type="submit" className="login-button">
-              Log In
+              Sign In
             </button>
           </form>
-          {/* Added Guest Login Button [NEW] */}
+          {/* Guest Login Button */}
           <button onClick={loginAsGuest} className="guest-login-button">
-            Log in as Guest
+            Continue as Guest
           </button>
           <div className="login-footer">
             <p>
-              Don't have an account? <Link to="/signup">Sign up</Link>
+              Don't have an account? <Link to="/signup">Create one</Link>
             </p>
           </div>
         </div>
-        <div className="login-image">
-          <img src={LoginVector} alt="Login Vector" />
-        </div>
+        {/* Pure CSS gradient panel — no image needed */}
+        <div className="login-image" />
       </div>
     </div>
   );

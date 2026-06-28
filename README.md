@@ -1,124 +1,166 @@
-# Diagno - Multi-Disease Prediction Platform
+# Diagno — AI-Powered Multi-Disease Diagnostic Platform
 
-Diagno is a full-stack web application for predicting heart disease, diabetes, breast cancer, and lung cancer using machine learning models. The project combines a React frontend, an Express backend, and MongoDB to deliver a polished experience for health screening and report generation.
+> Early detection saves lives. Diagno puts clinical-grade AI directly in your hands.
 
-## Table of Contents
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Environment Variables](#environment-variables)
-- [Future Enhancements](#future-enhancements)
-- [License](#license)
+Diagno is a full-stack web application that predicts four major diseases — **heart disease**, **diabetes**, **lung cancer**, and **breast cancer** — using purpose-built machine learning models. Users enter clinical parameters (or upload a medical PDF) and receive an instant prediction with a downloadable report.
 
-## Features
-- Secure signup and login with JWT-based authentication.
-- Disease prediction flows for heart disease, diabetes, breast cancer, and lung cancer.
-- Prescription upload support for heart and diabetes screening.
-- Medical image upload support for cancer predictions.
-- Downloadable PDF reports for prediction results.
-- Toast-based user feedback and protected routes.
+---
+
+## Why Diagno?
+
+Most medical AI projects are demos. Diagno is designed to feel like a real product:
+
+- **PDF extraction** — upload a real prescription/lab report and the system parses the values automatically
+- **Four independent ML models** — each disease uses the algorithm best suited to its data profile
+- **Downloadable PDF reports** — every prediction result can be exported as a structured clinical report
+- **Protected routes** — JWT auth ensures only registered users access the predictors
+- **Dark glassmorphism UI** — Space Grotesk typeface, neon cyan/violet palette, fully responsive
+
+---
+
+## Disease Models
+
+| Disease | Algorithm | Dataset | Notes |
+|---|---|---|---|
+| Heart Disease | Logistic Regression | UCI Cleveland | 13 clinical features |
+| Diabetes | Logistic Regression | Pima Indians | 8 features incl. BMI, insulin |
+| Lung Cancer | CNN (Inception-style) | CT scan images | Image classification |
+| Breast Cancer | SVM | Wisconsin Diagnostic | Fine-needle aspirate features |
+
+---
 
 ## Tech Stack
-- Frontend: React, Vite, React Router, React Toastify, PDF generation utilities.
-- Backend: Node.js, Express, Mongoose, JWT, Multer, Cloudinary support.
-- Database: MongoDB.
-- Machine learning: Logistic Regression, SVM, CNN, and Inception-style image models.
+
+**Frontend**
+- React 18 + Vite
+- React Router v6
+- `react-toastify` for feedback
+- `pdf-lib` for client-side PDF generation
+- `react-icons` for iconography
+- Vanilla CSS (no framework) — custom dark design system
+
+**Backend**
+- Node.js + Express
+- Mongoose + MongoDB
+- JWT (access + refresh token flow)
+- Multer for file uploads
+- Cloudinary-ready for cloud storage
+
+**ML Layer**
+- Python-based prediction endpoints
+- Scikit-learn (Logistic Regression, SVM)
+- TensorFlow/Keras (CNN for image-based cancer detection)
+
+---
 
 ## Project Structure
-```bash
+
+```
 Diagno/
 ├── Backend/
-│   ├── controllers/
+│   ├── controllers/       # Route handlers (auth, predict, PDF)
 │   ├── DataScrapingScripts/
-│   ├── db/
-│   ├── middlewares/
-│   ├── models/
-│   ├── routes/
-│   ├── utils/
+│   ├── db/                # MongoDB connection
+│   ├── middlewares/       # JWT verification
+│   ├── models/            # Mongoose schemas
+│   ├── routes/            # Express routers
+│   ├── utils/             # Helpers (token generation, etc.)
 │   ├── app.js
-│   ├── constants.js
-│   ├── index.js
-│   └── uploads/
+│   └── index.js
 ├── Frontend/
-│   ├── public/
+│   ├── public/            # Static assets, report templates
 │   └── src/
-├── Medical Reports/
-├── ML/
-├── LICENSE
+│       ├── assets/        # Images
+│       ├── components/    # Navbar, Footer, Card, Hero
+│       ├── context/       # UserContext (auth state)
+│       └── pages/         # Home, Predictors, Heart, Diabetes, Lung, Breast, Login, Signup
+├── ML/                    # Python ML model scripts
+├── Medical Reports/       # Sample report templates
 └── README.md
 ```
 
+---
+
 ## Getting Started
-1. Install Node.js and MongoDB locally.
-2. Install dependencies for both apps.
-3. Create the environment files from the examples and update the values.
-4. Start the backend and frontend.
 
-### 1) Install dependencies
-```powershell
+### Prerequisites
+- Node.js ≥ 18
+- MongoDB (local or Atlas)
+- Python 3.9+ (for ML endpoints)
+
+### 1. Clone and install
+
+```bash
+# Backend
 cd Backend
 npm install
 
+# Frontend
 cd ../Frontend
 npm install
 ```
 
-### 2) Create environment files
-```powershell
-cd Backend
-copy .env.example .env
+### 2. Configure environment
 
+```bash
+# Backend
+cd Backend
+copy .env.example .env   # Windows
+# cp .env.example .env   # Mac/Linux
+
+# Frontend
 cd ../Frontend
 copy .env.example .env
 ```
 
-### 3) Run the backend
-```powershell
-cd Backend
-npm run server
-```
-The backend will start on the configured port, usually http://localhost:8000/. If that port is already occupied, it will automatically fall back to another available port.
+### 3. Run
 
-### 4) Run the frontend
-Open a second terminal:
-```powershell
-cd Frontend
-npm run dev -- --host 0.0.0.0
-```
-The frontend will typically open at http://localhost:5175/ (Vite may choose a different available port if 5173 or 5174 are already in use).
+```bash
+# Backend only
+cd Backend && npm run server
 
-### 5) Run both together (optional)
-```powershell
-cd Backend
-npm run dev
+# Frontend only (new terminal)
+cd Frontend && npm run dev
+
+# Both together
+cd Backend && npm run dev
 ```
-This uses concurrently to launch both the backend and the frontend in one command.
+
+Backend: `http://localhost:8000`  
+Frontend: `http://localhost:5173`
+
+---
 
 ## Environment Variables
-The backend requires the following values:
-- PORT
-- MONGODB_URI
-- CORS_ORIGIN
-- ACCESS_TOKEN_SECRET
-- ACCESS_TOKEN_EXPIRY
-- REFRESH_TOKEN_SECRET
-- REFRESH_TOKEN_EXPIRY
-- CLOUDINARY_CLOUD_NAME (optional unless uploads are enabled)
-- CLOUDINARY_API_KEY (optional unless uploads are enabled)
-- CLOUDINARY_API_SECRET (optional unless uploads are enabled)
 
-The frontend uses:
-- VITE_API_URL
+### Backend `.env`
 
-## Screenshots
-Screenshots will be added here as the project evolves. For now, the app can be run locally and verified in the browser.
+| Variable | Description |
+|---|---|
+| `PORT` | Server port (default 8000) |
+| `MONGODB_URI` | MongoDB connection string |
+| `CORS_ORIGIN` | Allowed frontend origin |
+| `ACCESS_TOKEN_SECRET` | JWT access token secret |
+| `ACCESS_TOKEN_EXPIRY` | e.g. `1d` |
+| `REFRESH_TOKEN_SECRET` | JWT refresh token secret |
+| `REFRESH_TOKEN_EXPIRY` | e.g. `7d` |
+| `CLOUDINARY_CLOUD_NAME` | Optional — for upload support |
+| `CLOUDINARY_API_KEY` | Optional |
+| `CLOUDINARY_API_SECRET` | Optional |
 
-## Future Enhancements
-- Add OCR-based prescription extraction.
-- Expand into a mobile experience.
-- Add more disease predictors and richer analytics.
-- Improve image processing and report customization.
+### Frontend `.env`
 
-## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+| Variable | Description |
+|---|---|
+| `VITE_API_URL` | Backend base URL e.g. `http://localhost:8000` |
+
+---
+
+## Roadmap
+
+- [ ] OCR-based prescription text extraction
+- [ ] Mobile-responsive native app (React Native)
+- [ ] More disease predictors (kidney disease, liver disease)
+- [ ] Analytics dashboard with prediction history
+- [ ] Doctor consultation booking integration
+- [ ] Multi-language support

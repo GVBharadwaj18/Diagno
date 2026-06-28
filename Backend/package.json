@@ -9,7 +9,7 @@
     "client": "npm run dev --prefix ../Frontend",
     "dev": "concurrently \"npm run server\" \"npm run client\""
   },
-  "author": "Rhitam Chaudhury",
+  "author": "",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",

@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Card from "../components/Card";
@@ -27,16 +27,13 @@ function PredictorsPage() {
 
   return (
     <div className="predictor-container">
-      <ToastContainer />
+      <ToastContainer theme="dark" />
+      <h1>Disease Predictors</h1>
       <p className="description">
-        The Comprehensive Health Diagnostics Suite utilizes advanced AI
-        technology for early detection and precise prediction of breast cancer,
-        lung cancer, heart disease, and diabetes. By leveraging sophisticated
-        algorithms and extensive datasets, our system identifies these
-        conditions early, enabling timely interventions and personalized
-        treatments. Our mission is to transform healthcare into a predictive and
-        personalized experience, fostering a healthier future for all by
-        reducing the burden of these diseases and enhancing quality of life.
+        Diagno's diagnostic suite uses state-of-the-art machine learning models
+        trained on extensive clinical datasets to detect four major health conditions early.
+        Choose a predictor below to begin your personalised health assessment — fast,
+        private, and remarkably accurate.
       </p>
       <div className="card-container">
         <div

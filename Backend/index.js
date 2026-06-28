@@ -5,8 +5,6 @@ import connectDB from "./db/index.js";
 import { app } from "./app.js";
 import os from "os";
 import path from "path";
-import express from "express";
-import net from "net";
 
 dotenv.config({ path: ".env" });
 
@@ -27,39 +25,22 @@ function getLocalIpAddress() {
   return "localhost";
 }
 
-function getAvailablePort(startPort) {
-  return new Promise((resolve, reject) => {
-    const tryPort = (port) => {
-      const server = net.createServer();
-      server.unref();
-      server.once("error", (error) => {
-        if (error.code === "EADDRINUSE") {
-          tryPort(port + 1);
-          return;
-        }
-        reject(error);
-      });
-      server.listen(port, "0.0.0.0", () => {
-        const address = server.address();
-        server.close(() => resolve(address.port));
-      });
-    };
-
-    tryPort(startPort);
-  });
-}
 
 connectDB()
-  .then(async () => {
-    const configuredPort = Number(process.env.PORT || 8000);
-    const port = await getAvailablePort(configuredPort);
+  .then(() => {
+    const port = Number(process.env.PORT || 8000);
 
-    app.listen(port, () => {
+    const server = app.listen(port, () => {
       console.log(`Server is running at port : ${port}`);
       const ip = getLocalIpAddress();
       console.log(`Server running at http://${ip}:${port}/`);
+    });
+
+    server.on("error", (error) => {
+      console.error("Server error:", error);
     });
   })
   .catch((err) => {
     console.log("MONGODB connection failed !!!", err);
   });
+

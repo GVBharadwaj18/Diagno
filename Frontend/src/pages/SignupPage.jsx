@@ -1,6 +1,5 @@
 import React, { useState, useContext } from "react";
 import "../App.css";
-import SignupVector from "../assets/SignupVector.png";
 import { UserContext } from "../context/UserContext";
 import { useNavigate, Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
@@ -93,10 +92,16 @@ function SignupPage() {
         pauseOnFocusLoss
         draggable
         pauseOnHover
+        theme="dark"
       />
       <div className="signup-container">
+        {/* Pure CSS gradient panel — no image needed */}
+        <div className="signup-image" />
         <div className="signup-form-container">
-          <h2 className="signup-title">Sign Up</h2>
+          <h2 className="signup-title">Create Account</h2>
+          <p style={{ color: "#64748b", fontSize: "0.9rem", marginBottom: "0.5rem" }}>
+            Join Diagno — your health, amplified
+          </p>
           <form className="signup-form" onSubmit={signup}>
             <input
               type="text"
@@ -112,7 +117,7 @@ function SignupPage() {
             />
             <input
               type="email"
-              placeholder="Email"
+              placeholder="Email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -123,17 +128,14 @@ function SignupPage() {
               onChange={(e) => setPassword(e.target.value)}
             />
             <button type="submit" className="signup-button">
-              Sign Up
+              Create Account
             </button>
           </form>
           <div className="signup-footer">
             <p>
-              Already have an account? <Link to="/login">Log in</Link>
+              Already have an account? <Link to="/login">Sign in</Link>
             </p>
           </div>
-        </div>
-        <div className="signup-image">
-          <img src={SignupVector} alt="Signup Vector" />
         </div>
       </div>
     </div>
