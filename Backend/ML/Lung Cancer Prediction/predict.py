@@ -1,8 +1,5 @@
 import os
 import sys
-import numpy as np
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing import image
 import contextlib
 
 # Suppress TensorFlow INFO and WARNING logs
@@ -26,6 +23,10 @@ if os.path.getsize(model_path) < 1000:
     else:
         print("cancerous")
     sys.exit(0)
+
+import numpy as np
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing import image
 
 try:
     model = load_model(model_path)

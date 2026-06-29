@@ -1,9 +1,5 @@
 import os
 import sys
-import numpy as np
-from tensorflow.keras.models import load_model # type: ignore
-from tensorflow.keras.preprocessing import image # type: ignore
-import tensorflow as tf
 import contextlib
 
 # Suppress TensorFlow INFO and WARNING logs
@@ -27,6 +23,11 @@ if os.path.getsize(model_path) < 1000:
     else:
         print("Malignant (suffering from Breast Cancer)")
     sys.exit(0)
+
+import numpy as np
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing import image
+import tensorflow as tf
 
 model = load_model(model_path)
 

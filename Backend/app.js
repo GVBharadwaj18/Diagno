@@ -7,14 +7,13 @@ import pdfRouter from "./routes/pdf.routes.js"; // Import pdfRoutes
 
 const app = express();
 
-const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
-  .split(",")
-  .map((origin) => origin.trim());
-
 app.use(
   cors({
     origin: function (origin, callback) {
       if (!origin) return callback(null, true);
+      const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
+        .split(",")
+        .map((o) => o.trim());
       if (
         allowedOrigins.includes("*") ||
         allowedOrigins.includes(origin)

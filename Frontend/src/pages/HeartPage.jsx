@@ -172,49 +172,126 @@ const HeartPage = () => {
       const firstPage = pages[0];
       const { width, height } = firstPage.getSize();
 
-      // Draw each field from formData onto the PDF
-      const fields = [
-        { label: "Age:", value: formData.age },
-        { label: "Sex:", value: formData.sex },
-        { label: "Chest Pain Type:", value: formData.chestPainType },
-        {
-          label: "Resting Blood Pressure:",
-          value: formData.restingBloodPressure,
-        },
-        { label: "Serum Cholesterol:", value: formData.serumCholesterol },
-        { label: "Fasting Blood Sugar:", value: formData.fastingBloodSugar },
-        { label: "Resting ECG:", value: formData.restingECG },
-        {
-          label: "Maximum Heart Rate Achieved:",
-          value: formData.maxHeartRate,
-        },
-        {
-          label: "Exercise Induced Angina:",
-          value: formData.exerciseInducedAngina,
-        },
-        { label: "Old Peak:", value: formData.oldPeak },
-        { label: "Slope:", value: formData.slope },
-        {
-          label: "Number of Major Vessels (0-3):",
-          value: formData.numMajorVessels,
-        },
-        { label: "Thal:", value: formData.thal },
-        { label: "Prediction Result:", value: predictionResult },
-      ];
+      const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-      let yOffset = height - 250; // Starting Y position with more spacing
-      const lineHeight = 20; // Line height between fields
-
-      fields.forEach(({ label, value }) => {
-        firstPage.drawText(`${label} ${value}`, {
-          x: 50,
-          y: yOffset,
-          size: 12,
-          font: helveticaFont,
-          color: rgb(0, 0, 0),
-        });
-        yOffset -= lineHeight; // Move Y position up for the next line
+      // Section Title
+      firstPage.drawText("PATIENT DIAGNOSTIC REPORT (HEART DISEASE)", {
+        x: 45,
+        y: height - 150,
+        font: helveticaBold,
+        size: 16,
+        color: rgb(0.0118, 0.2941, 0.6784),
       });
+
+      // Date of Report
+      const currentDate = new Date().toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+      firstPage.drawText(`Date: ${currentDate}`, {
+        x: 45,
+        y: height - 165,
+        font: helveticaFont,
+        size: 10,
+        color: rgb(0.4, 0.4, 0.4),
+      });
+
+      // Clinical Metrics Header
+      firstPage.drawText("CLINICAL MEASUREMENTS", {
+        x: 45,
+        y: height - 195,
+        font: helveticaBold,
+        size: 11,
+        color: rgb(0.2, 0.2, 0.2),
+      });
+
+      // Metrics Grid Box (larger height for 7 rows)
+      firstPage.drawRectangle({
+        x: 45,
+        y: height - 355,
+        width: 505,
+        height: 145,
+        color: rgb(0.97, 0.98, 0.99),
+        borderColor: rgb(0.9, 0.92, 0.95),
+        borderWidth: 1,
+      });
+
+      // Column 1
+      const col1Y = height - 230;
+      firstPage.drawText(`Age: ${formData.age} years`, { x: 60, y: col1Y, size: 9, font: helveticaFont });
+      firstPage.drawText(`Sex: ${formData.sex === "1" || formData.sex.toLowerCase() === "male" ? "Male" : "Female"}`, { x: 60, y: col1Y - 18, size: 9, font: helveticaFont });
+      firstPage.drawText(`Chest Pain Type: ${formData.chestPainType}`, { x: 60, y: col1Y - 36, size: 9, font: helveticaFont });
+      firstPage.drawText(`Resting BP: ${formData.restingBloodPressure} mmHg`, { x: 60, y: col1Y - 54, size: 9, font: helveticaFont });
+      firstPage.drawText(`Cholesterol: ${formData.serumCholesterol} mg/dL`, { x: 60, y: col1Y - 72, size: 9, font: helveticaFont });
+      firstPage.drawText(`Fasting Blood Sugar: ${formData.fastingBloodSugar}`, { x: 60, y: col1Y - 90, size: 9, font: helveticaFont });
+      firstPage.drawText(`Resting ECG: ${formData.restingECG}`, { x: 60, y: col1Y - 108, size: 9, font: helveticaFont });
+
+      // Column 2
+      const col2Y = height - 230;
+      firstPage.drawText(`Max Heart Rate: ${formData.maxHeartRate} bpm`, { x: 300, y: col2Y, size: 9, font: helveticaFont });
+      firstPage.drawText(`Exercise Angina: ${formData.exerciseInducedAngina}`, { x: 300, y: col2Y - 18, size: 9, font: helveticaFont });
+      firstPage.drawText(`Old Peak: ${formData.oldPeak}`, { x: 300, y: col2Y - 36, size: 9, font: helveticaFont });
+      firstPage.drawText(`Slope: ${formData.slope}`, { x: 300, y: col2Y - 54, size: 9, font: helveticaFont });
+      firstPage.drawText(`Major Vessels (0-3): ${formData.numMajorVessels}`, { x: 300, y: col2Y - 72, size: 9, font: helveticaFont });
+      firstPage.drawText(`Thal: ${formData.thal}`, { x: 300, y: col2Y - 90, size: 9, font: helveticaFont });
+
+      // Diagnosis Section Header
+      firstPage.drawText("DIAGNOSTIC ASSESSMENT", {
+        x: 45,
+        y: height - 385,
+        font: helveticaBold,
+        size: 11,
+        color: rgb(0.2, 0.2, 0.2),
+      });
+
+      const isPositive = !predictionResult.toLowerCase().includes("not");
+
+      // Draw Diagnosis Box
+      firstPage.drawRectangle({
+        x: 45,
+        y: height - 465,
+        width: 505,
+        height: 65,
+        color: isPositive ? rgb(0.996, 0.95, 0.95) : rgb(0.94, 0.99, 0.96),
+        borderColor: isPositive ? rgb(0.937, 0.267, 0.267) : rgb(0.133, 0.773, 0.369),
+        borderWidth: 1.5,
+      });
+
+      // Result title
+      firstPage.drawText(isPositive ? "HIGH RISK DETECTED" : "NO RISK DETECTED", {
+        x: 60,
+        y: height - 425,
+        font: helveticaBold,
+        size: 12,
+        color: isPositive ? rgb(0.78, 0.15, 0.15) : rgb(0.09, 0.54, 0.24),
+      });
+
+      // Result detail text
+      firstPage.drawText(predictionResult, {
+        x: 60,
+        y: height - 447,
+        font: helveticaFont,
+        size: 11,
+        color: rgb(0.1, 0.1, 0.1),
+      });
+
+      // Disclaimer Box
+      firstPage.drawText("Disclaimer & Clinical Notes:", {
+        x: 45,
+        y: height - 505,
+        font: helveticaBold,
+        size: 10,
+        color: rgb(0.3, 0.3, 0.3),
+      });
+
+      const disclaimerText1 = "This prediction is generated by an artificial intelligence model trained on clinical diagnostic data.";
+      const disclaimerText2 = "It is intended for screening and educational assistance only, and does not constitute a medical diagnosis.";
+      const disclaimerText3 = "Please present this report to a qualified healthcare provider for clinical correlation and definitive diagnosis.";
+
+      firstPage.drawText(disclaimerText1, { x: 45, y: height - 523, font: helveticaFont, size: 9, color: rgb(0.5, 0.5, 0.5) });
+      firstPage.drawText(disclaimerText2, { x: 45, y: height - 537, font: helveticaFont, size: 9, color: rgb(0.5, 0.5, 0.5) });
+      firstPage.drawText(disclaimerText3, { x: 45, y: height - 551, font: helveticaFont, size: 9, color: rgb(0.5, 0.5, 0.5) });
 
       const pdfBytes = await pdfDoc.save();
       const blob = new Blob([pdfBytes], { type: "application/pdf" });
