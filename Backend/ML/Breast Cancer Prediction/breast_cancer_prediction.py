@@ -25,8 +25,8 @@ if os.path.getsize(model_path) < 1000:
     sys.exit(0)
 
 import numpy as np
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing import image
+from keras.models import load_model
+from keras.preprocessing import image
 import tensorflow as tf
 
 model = load_model(model_path)

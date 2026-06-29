@@ -2,8 +2,8 @@ import os
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 import sys
 import numpy as np
-from tensorflow.keras.models import load_model # type: ignore
-from tensorflow.keras.preprocessing import image # type: ignore
+from keras.models import load_model
+from keras.preprocessing import image
 import tensorflow as tf
 import contextlib
 
