@@ -34,9 +34,6 @@ const registerUser = asyncHandler(async (req, res) => {
   // return res
 
   const { fullname, email, username, password } = req.body;
-  //console.log("email: ", email);
-  console.log(req.body);
-  console.log(fullname, email, username, password);
 
   if (
     [fullname, email, username, password].some((field) => field?.trim() === "")
@@ -61,7 +58,6 @@ const registerUser = asyncHandler(async (req, res) => {
     fullname,
     password,
   });
-  console.log("User is ", user);
 
   const createdUser = await User.findById(user._id).select(
     "-password -refreshToken"
@@ -71,9 +67,27 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Something went wrong while registering the user");
   }
 
+  // Auto-login: generate tokens and set cookies so the user is immediately authenticated
+  const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(user._id);
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "None",
+    path: "/",
+  };
+
   return res
     .status(201)
-    .json(new ApiResponse(200, createdUser, "User registered Successfully"));
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+      new ApiResponse(
+        201,
+        { user: createdUser, accessToken, refreshToken },
+        "User registered successfully"
+      )
+    );
 });
 
 const loginUser = asyncHandler(async (req, res) => {

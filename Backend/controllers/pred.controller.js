@@ -204,20 +204,22 @@ const lungpred = asyncHandler(async (req, res) => {
     ]);
 
     let predictionData = "";
-    let errorOccurred = false;
+    let stderrData = "";
 
     pythonProcess.stdout.on("data", (data) => {
       predictionData += data.toString();
     });
 
     pythonProcess.stderr.on("data", (data) => {
-      console.error(`Error from Python script: ${data}`);
-      errorOccurred = true;
-      res.status(500).json({ error: "Prediction error" });
+      stderrData += data.toString();
     });
 
     pythonProcess.on("close", (code) => {
-      if (code === 0 && !errorOccurred) {
+      console.log(`Lung cancer prediction exited with code ${code}`);
+
+      if (res.headersSent) return;
+
+      if (code === 0) {
         predictionData = predictionData.trim();
         if (predictionData === "cancerous") {
           res
@@ -228,9 +230,11 @@ const lungpred = asyncHandler(async (req, res) => {
             .status(200)
             .json({ prediction: "Person is not suffering from Lung Cancer" });
         } else {
+          console.error(`Unexpected output: ${predictionData}`);
           res.status(500).json({ error: "Unexpected prediction result" });
         }
-      } else if (!errorOccurred) {
+      } else {
+        console.error(`Lung prediction script error: ${stderrData}`);
         res.status(500).json({ error: "Prediction error" });
       }
 
@@ -243,58 +247,71 @@ const lungpred = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     console.error("Error in lungpred controller:", error);
-    res.status(500).json({ error: "Internal server error" });
+    if (!res.headersSent) {
+      res.status(500).json({ error: "Internal server error" });
+    }
   }
 });
 
 const breastpred = asyncHandler(async (req, res) => {
-  if (!req.file) {
-    console.error("Multer did not process the file");
-    throw new ApiError(400, "No image file uploaded");
-  }
-
-  const filePath = path.resolve(__dirname, "..", "uploads", req.file.filename);
-  console.log("Resolved file path:", filePath);
-
-  if (!fs.existsSync(filePath)) {
-    throw new ApiError(404, "Uploaded file not found");
-  }
-
-  const pythonProcess = spawn("python", [
-    path.resolve(
-      __dirname,
-      "../ML/Breast Cancer Prediction/breast_cancer_prediction.py"
-    ),
-    filePath,
-  ]);
-
-  let predictionData = "";
-  let errorOccurred = false;
-
-  pythonProcess.stdout.on("data", (data) => {
-    predictionData += data.toString();
-  });
-
-  pythonProcess.stderr.on("data", (data) => {
-    console.error(`Error: ${data}`);
-    errorOccurred = true;
-    res.status(500).json({ error: "Prediction error" });
-  });
-
-  pythonProcess.on("close", (code) => {
-    if (code === 0 && !errorOccurred) {
-      res.status(200).json({ prediction: predictionData.trim() });
-    } else if (!errorOccurred) {
-      res.status(500).json({ error: "Prediction error" });
+  try {
+    if (!req.file) {
+      console.error("Multer did not process the file");
+      throw new ApiError(400, "No image file uploaded");
     }
 
-    // Always delete the file after the prediction process
-    fs.unlink(filePath, (err) => {
-      if (err) {
-        console.error("Error deleting file:", err);
-      }
+    const filePath = path.resolve(__dirname, "..", "uploads", req.file.filename);
+    console.log("Resolved file path:", filePath);
+
+    if (!fs.existsSync(filePath)) {
+      throw new ApiError(404, "Uploaded file not found");
+    }
+
+    const pythonProcess = spawn("python", [
+      path.resolve(
+        __dirname,
+        "../ML/Breast Cancer Prediction/breast_cancer_prediction.py"
+      ),
+      filePath,
+    ]);
+
+    let predictionData = "";
+    let stderrData = "";
+
+    pythonProcess.stdout.on("data", (data) => {
+      predictionData += data.toString();
     });
-  });
+
+    pythonProcess.stderr.on("data", (data) => {
+      stderrData += data.toString();
+    });
+
+    pythonProcess.on("close", (code) => {
+      console.log(`Breast cancer prediction exited with code ${code}`);
+
+      if (res.headersSent) return;
+
+      if (code === 0) {
+        res.status(200).json({ prediction: predictionData.trim() });
+      } else {
+        console.error(`Breast prediction script error: ${stderrData}`);
+        res.status(500).json({ error: "Prediction error" });
+      }
+
+      // Always delete the file after the prediction process
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error("Error deleting file:", err);
+        }
+      });
+    });
+  } catch (error) {
+    console.error("Error in breastpred controller:", error);
+    if (!res.headersSent) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
 });
 
 export { heartpred, diabetespred, lungpred, breastpred };
+

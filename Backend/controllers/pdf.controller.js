@@ -2,51 +2,6 @@ import { spawn } from "child_process";
 import path from "path";
 import fs from "fs";
 
-// Function to handle Heart Disease Report scraping
-export const heartScraper = (req, res) => {
-  const pdfPath = path.join("uploads", req.file.filename);
-
-  const pythonProcess = spawn("python", [
-    "../DataScrapingScripts/scrapHeart.py",
-    pdfPath,
-  ]);
-
-  pythonProcess.stdout.on("data", (data) => {
-    try {
-      const extractedData = JSON.parse(data.toString());
-      res.json(extractedData);
-
-      // Delete the PDF file after sending response
-      deleteFile(pdfPath);
-    } catch (error) {
-      console.error("Error parsing JSON data from Python script:", error);
-      res.status(500).send("Error processing PDF");
-
-      // Delete the PDF file on error
-      deleteFile(pdfPath);
-    }
-  });
-
-  pythonProcess.stderr.on("data", (data) => {
-    console.error(`stderr: ${data}`);
-    res.status(500).send("Error processing PDF");
-
-    // Delete the PDF file on error
-    deleteFile(pdfPath);
-  });
-
-  pythonProcess.on("close", (code) => {
-    console.log(`child process exited with code ${code}`);
-
-    if (code !== 0 && !res.headersSent) {
-      res.status(500).send("Error processing PDF");
-    }
-
-    // Delete the PDF file after processing
-    deleteFile(pdfPath);
-  });
-};
-
 function deleteFile(filePath) {
   fs.unlink(filePath, (err) => {
     if (err) {
@@ -57,6 +12,49 @@ function deleteFile(filePath) {
   });
 }
 
+// Function to handle Heart Disease Report scraping
+export const heartScraper = (req, res) => {
+  const pdfPath = path.join("uploads", req.file.filename);
+
+  const pythonProcess = spawn("python", [
+    "../DataScrapingScripts/scrapHeart.py",
+    pdfPath,
+  ]);
+
+  let stdoutData = "";
+  let stderrData = "";
+
+  pythonProcess.stdout.on("data", (data) => {
+    stdoutData += data.toString();
+  });
+
+  pythonProcess.stderr.on("data", (data) => {
+    stderrData += data.toString();
+  });
+
+  pythonProcess.on("close", (code) => {
+    console.log(`Heart scraper exited with code ${code}`);
+
+    if (res.headersSent) return;
+
+    if (code === 0) {
+      try {
+        const extractedData = JSON.parse(stdoutData.trim());
+        res.json(extractedData);
+      } catch (error) {
+        console.error("Error parsing JSON data from Python script:", error);
+        res.status(500).send("Error processing PDF");
+      }
+    } else {
+      console.error(`Heart scraper error: ${stderrData}`);
+      res.status(500).send("Error processing PDF");
+    }
+
+    // Delete the PDF file after processing
+    deleteFile(pdfPath);
+  });
+};
+
 // Function to handle Diabetes Report scraping
 export const diabetesScraper = (req, res) => {
   const pdfPath = path.join("uploads", req.file.filename);
@@ -66,37 +64,32 @@ export const diabetesScraper = (req, res) => {
     pdfPath,
   ]);
 
+  let stdoutData = "";
+  let stderrData = "";
+
   pythonProcess.stdout.on("data", (data) => {
-    try {
-      const extractedData = JSON.parse(data.toString());
-      // Implement your diabetes prediction logic here using extractedData
-
-      // For demonstration, sending extracted data back as response
-      res.json(extractedData);
-
-      // Delete the PDF file after sending response
-      deleteFile(pdfPath);
-    } catch (error) {
-      console.error("Error parsing JSON data from Python script:", error);
-      res.status(500).send("Error processing PDF");
-
-      // Delete the PDF file on error
-      deleteFile(pdfPath);
-    }
+    stdoutData += data.toString();
   });
 
   pythonProcess.stderr.on("data", (data) => {
-    console.error(`stderr: ${data}`);
-    res.status(500).send("Error processing PDF");
-
-    // Delete the PDF file on error
-    deleteFile(pdfPath);
+    stderrData += data.toString();
   });
 
   pythonProcess.on("close", (code) => {
-    console.log(`child process exited with code ${code}`);
+    console.log(`Diabetes scraper exited with code ${code}`);
 
-    if (code !== 0 && !res.headersSent) {
+    if (res.headersSent) return;
+
+    if (code === 0) {
+      try {
+        const extractedData = JSON.parse(stdoutData.trim());
+        res.json(extractedData);
+      } catch (error) {
+        console.error("Error parsing JSON data from Python script:", error);
+        res.status(500).send("Error processing PDF");
+      }
+    } else {
+      console.error(`Diabetes scraper error: ${stderrData}`);
       res.status(500).send("Error processing PDF");
     }
 

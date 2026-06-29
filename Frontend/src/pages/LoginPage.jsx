@@ -1,6 +1,6 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import "../App.css";
-import { UserContext } from "../context/UserContext";
+import { useUserContext } from "../context/UserContext";
 import { useNavigate, Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -10,7 +10,7 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { setUserInfo } = useContext(UserContext);
+  const { setUserInfo } = useUserContext();
   const navigate = useNavigate();
   async function login(e) {
     e.preventDefault();
@@ -36,24 +36,22 @@ function LoginPage() {
         credentials: "include",
       });
 
+      const result = await response.json();
+
       if (!response.ok) {
-        if (response.status === 401) {
-          // Unauthorized error
-          toast.error("Email or password does not match");
-        } else {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        // Show server-side error message when available
+        toast.error(result?.message || (response.status === 401 ? "Email or password does not match" : `Error: ${response.status}`));
         return;
       }
 
-      const userInfo = await response.json();
-      setUserInfo(userInfo);
+      // The backend wraps the response: { statusCode, data: { user, accessToken, refreshToken }, message }
+      setUserInfo(result.data?.user || result.data);
       toast.success("Login successful! Redirecting to homepage...");
 
-      // Delay navigation to show the toast for a few seconds
+      // Short delay so toast is visible, then redirect
       setTimeout(() => {
         navigate("/");
-      }, 3000); // 3 seconds delay
+      }, 1500);
     } catch (error) {
       console.error("Error:", error);
       toast.error("An unexpected error occurred. Please try again.");

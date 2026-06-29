@@ -1,7 +1,7 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FaBars, FaTimes } from "react-icons/fa";
-import { UserContext } from "../context/UserContext";
+import { useUserContext } from "../context/UserContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -39,32 +39,27 @@ function BrandLogo() {
 }
 
 function Navbar() {
-  const { userInfo, setUserInfo } = useContext(UserContext);
+  const { userInfo, setUserInfo } = useUserContext();
   const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
 
+  // On mount: always ask the server if we have a valid session.
+  // The httpOnly accessToken cookie is invisible to JS (document.cookie)
+  // but the browser sends it automatically with credentials:"include".
+  // The server returns the user if the cookie is valid, or 401 if not.
   useEffect(() => {
-    const token = document.cookie
-      .split(";")
-      .map((item) => item.trim())
-      .find((item) => item.startsWith("accessToken="));
+    fetchProfile();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    if (token) {
-      fetchProfile();
-    } else {
-      setUserInfo(null);
-    }
-
+  // Separate effect for resize — runs when isMobile changes
+  useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > 954 && isMobile) {
         setIsMobile(false);
       }
     };
-
     window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
+    return () => window.removeEventListener("resize", handleResize);
   }, [isMobile]);
 
   const fetchProfile = async () => {
@@ -74,8 +69,10 @@ function Navbar() {
         }
       );
       if (response.ok) {
-        const userData = await response.json();
-        setUserInfo(userData);
+        const result = await response.json();
+        // API wraps response: { statusCode, data, message, success }
+        // Store only the plain user object to match login/signup shape
+        setUserInfo(result.data || result);
       } else {
         setUserInfo(null);
       }
@@ -108,7 +105,8 @@ function Navbar() {
     }
   };
 
-  const isLoggedIn = userInfo?.data?.username;
+  // userInfo is now a plain user object { username, email, fullname, ... } or null
+  const isLoggedIn = userInfo?.username;
 
   const toggleMobileMenu = () => {
     setIsMobile(!isMobile);
@@ -165,7 +163,7 @@ function Navbar() {
                 fontSize: "0.95rem",
               }}
             >
-              Hi, <strong style={{ color: "#00d4ff" }}>{userInfo.data.username}</strong>
+              Hi, <strong style={{ color: "#00d4ff" }}>{userInfo.username}</strong>
             </span>
             <NavLink
               to="/"

@@ -10,7 +10,7 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
       req.header("Authorization")?.replace("Bearer ", "");
 
     if (!token) {
-      return next();
+      throw new ApiError(401, "Unauthorized: No access token provided");
     }
 
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
@@ -20,12 +20,14 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
     );
 
     if (!user) {
-      return next();
+      throw new ApiError(401, "Unauthorized: Invalid access token");
     }
 
     req.user = user;
     next();
   } catch (error) {
-    return next();
+    // Re-throw ApiErrors directly; wrap JWT errors as 401
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(401, error?.message || "Unauthorized");
   }
 });

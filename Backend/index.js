@@ -1,12 +1,13 @@
 // require('dotenv').config({path:'./env'})
 
 import dotenv from "dotenv";
+dotenv.config({ path: ".env" });
+
 import connectDB from "./db/index.js";
 import { app } from "./app.js";
+import express from "express";
 import os from "os";
 import path from "path";
-
-dotenv.config({ path: ".env" });
 
 const _dirname = path.dirname("");
 const frontendBP = path.join(_dirname, "../Frontend/dist");

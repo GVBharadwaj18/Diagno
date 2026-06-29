@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -7,15 +7,15 @@ import heartImage from "../assets/heart.png";
 import lungImage from "../assets/lung.png";
 import diabetesImage from "../assets/diabetes.png";
 import breastImage from "../assets/breast.png";
-import { UserContext } from "../context/UserContext";
+import { useUserContext } from "../context/UserContext";
 import "../App.css";
 
 function PredictorsPage() {
-  const { userInfo } = useContext(UserContext);
+  const { userInfo } = useUserContext();
   const navigate = useNavigate();
 
   const handleLinkClick = (path) => {
-    if (userInfo) {
+    if (userInfo?.username) {
       navigate(path);
     } else {
       toast.info("Please log in to access this predictor.");

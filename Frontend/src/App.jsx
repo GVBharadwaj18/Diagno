@@ -11,7 +11,7 @@ import LungPage from "./pages/LungPage";
 import HeartPage from "./pages/HeartPage";
 import DiabetesPage from "./pages/DiabetesPage";
 import NotFoundPage from "./pages/NotFoundPage";
-import { UserContextProvider } from "./context/UserContext";
+import { UserContextProvider } from "./context/UserContext.jsx";
 
 // Layout wrapper: Navbar + content + Footer
 function Layout({ children }) {

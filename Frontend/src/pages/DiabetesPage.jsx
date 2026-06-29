@@ -2,10 +2,7 @@ import React, { useState } from "react";
 import "../App.css";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { FiUpload, FiFileText } from "react-icons/fi";
-import Loader from "react-loader-spinner";
-import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
-
-import dotenv from "dotenv";
+import { ClipLoader } from "react-spinners";
 
 const DiabetesPage = () => {
   const [formData, setFormData] = useState({
@@ -197,7 +194,7 @@ const DiabetesPage = () => {
         className="loader-overlay"
         style={{ display: loading ? "flex" : "none" }}
       >
-        <Loader type="TailSpin" color="#FFF" height={70} width={70} />
+        <ClipLoader color="#FFF" size={60} />
       </div>
       {!showResult ? (
         <form className="diabetes-page-form" onSubmit={handleSubmit}>

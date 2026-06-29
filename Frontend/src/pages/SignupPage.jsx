@@ -1,6 +1,6 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import "../App.css";
-import { UserContext } from "../context/UserContext";
+import { useUserContext } from "../context/UserContext";
 import { useNavigate, Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -11,7 +11,7 @@ function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { setUserInfo } = useContext(UserContext);
+  const { setUserInfo } = useUserContext();
   const navigate = useNavigate();
 
   async function signup(e) {
@@ -62,18 +62,23 @@ function SignupPage() {
         }
       );
 
+      const result = await response.json();
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        // Show server-side error message if available
+        toast.error(result?.message || `Error: ${response.status}`);
+        return;
       }
 
-      const userInfo = await response.json();
-      setUserInfo(userInfo);
+      // Backend now returns { user, accessToken, refreshToken } inside data
+      // after auto-login on signup. Store only the plain user object.
+      setUserInfo(result.data?.user || result.data);
       toast.success("Signup successful! Redirecting to homepage...");
 
-      // Delay navigation to show the toast for a few seconds
+      // Short delay so toast is visible, then redirect
       setTimeout(() => {
         navigate("/");
-      }, 3000); // 3 seconds delay
+      }, 1500);
     } catch (error) {
       console.error("Error:", error);
       toast.error("An unexpected error occurred. Please try again.");

@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import "../App.css";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib"; // Ensure correct import
 import { FiUpload, FiFileText } from "react-icons/fi";
-import Loader from "react-loader-spinner";
-import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
+import { ClipLoader } from "react-spinners";
 
 const HeartPage = () => {
   const [formData, setFormData] = useState({
@@ -241,7 +240,7 @@ const HeartPage = () => {
         className="loader-overlay"
         style={{ display: loading ? "flex" : "none" }}
       >
-        <Loader type="TailSpin" color="#FFF" height={70} width={70} />
+        <ClipLoader color="#FFF" size={60} />
       </div>
       {!showResult ? (
         <form className="heart-page-form" onSubmit={handleSubmit}>
