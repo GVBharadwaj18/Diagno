@@ -2,6 +2,8 @@ import { spawn } from "child_process";
 import path from "path";
 import fs from "fs";
 
+const pythonCommand = process.env.PYTHON_COMMAND || "python";
+
 function deleteFile(filePath) {
   fs.unlink(filePath, (err) => {
     if (err) {
@@ -16,7 +18,7 @@ function deleteFile(filePath) {
 export const heartScraper = (req, res) => {
   const pdfPath = path.join("uploads", req.file.filename);
 
-  const pythonProcess = spawn("python", [
+  const pythonProcess = spawn(pythonCommand, [
     "../DataScrapingScripts/scrapHeart.py",
     pdfPath,
   ]);
@@ -59,7 +61,7 @@ export const heartScraper = (req, res) => {
 export const diabetesScraper = (req, res) => {
   const pdfPath = path.join("uploads", req.file.filename);
 
-  const pythonProcess = spawn("python", [
+  const pythonProcess = spawn(pythonCommand, [
     "../DataScrapingScripts/scrapDiabetes.py",
     pdfPath,
   ]);

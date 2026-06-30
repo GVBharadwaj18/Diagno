@@ -32,7 +32,7 @@ const upload = multer({ storage: storage });
 
 export { upload };
 
-const pythonCommand = "python";
+const pythonCommand = process.env.PYTHON_COMMAND || "python";
 
 // Define the relative path to the heartpredict.py script
 const heartPath = resolve(
